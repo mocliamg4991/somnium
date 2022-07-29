@@ -14,26 +14,37 @@ class RecursiveField(serializers.Serializer):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
 
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    position = serializers.StringRelatedField(many=True)
-    
-
     class Meta:
         model = Profile
-        fields = ['id', 'patronymic', 'user','code','position','user','avatar','salary']
+        fields = ['id', 'patronymic', 'user','code','position','subdivision','user','avatar','salary']
+
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        positions = validated_data.pop('position')
+        user = User.objects.create(**user_data)
+        profile = Profile.objects.create(user=user, **validated_data)
+        for position in positions:
+            profile.position.add(position)
+        return profile
+
+
+
+
 
 
 class PositionSerializer(serializers.ModelSerializer):
-    children = RecursiveField(many=True)
-    parent = serializers.StringRelatedField()
+    children = RecursiveField(many=True, read_only=True)
     class Meta:
         model = Position
         fields = ['id', 'name', 'parent','children']
 
 class SubdivisionSerializer(serializers.ModelSerializer):
-    children = RecursiveField(many=True)
-    parent = serializers.StringRelatedField()
+    children = RecursiveField(many=True, read_only=True)
     class Meta:
         model = Subdivision
         fields = ['id', 'name', 'parent','children']

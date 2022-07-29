@@ -15,13 +15,13 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 
-class PositionList(generics.ListAPIView):
+class PositionList(generics.ListCreateAPIView):
     queryset = Position.objects.all()
     serializer_class = PositionSerializer
 
 
 
-class SubdivisionList(generics.ListAPIView):
+class SubdivisionList(generics.ListCreateAPIView):
     queryset = Subdivision.objects.all()
     serializer_class = SubdivisionSerializer
 
